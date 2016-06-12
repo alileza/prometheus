@@ -14,17 +14,57 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
+	"golang.org/x/net/context"
+
+	"github.com/prometheus/client_golang/api/prometheus"
 	"github.com/prometheus/common/version"
 	"github.com/prometheus/prometheus/config"
 	"github.com/prometheus/prometheus/promql"
 	"github.com/prometheus/prometheus/util/cli"
 )
+
+var (
+	server  = flag.String("server", "http://localhost:9090", "URL of the Prometheus server to query (default http://localhost:9090)")
+	timeout = flag.Duration("timeout", time.Second, "Timeout to use when querying the Prometheus server (default 1m0s)")
+)
+
+// Query returns metrics from the prometheus server.
+func Query(t cli.Term, args ...string) int {
+	if len(args) == 0 {
+		t.Infof("usage: promtool [flags] query <expression>")
+		return 2
+	}
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, *timeout)
+	defer cancel()
+
+	client, err := prometheus.New(prometheus.Config{
+		Address: *server,
+	})
+	if err != nil {
+		t.Errorf(" FAILED: %s", err)
+		return 1
+	}
+
+	api := prometheus.NewQueryAPI(client)
+	result, err := api.Query(ctx, args[0], time.Now())
+	if err != nil {
+		t.Errorf(" FAILED: %s", err)
+		return 1
+	}
+
+	fmt.Println(result)
+	return 0
+}
 
 // CheckConfigCmd validates configuration files.
 func CheckConfigCmd(t cli.Term, args ...string) int {
@@ -189,6 +229,7 @@ func VersionCmd(t cli.Term, _ ...string) int {
 }
 
 func main() {
+	flag.Parse()
 	app := cli.NewApp("promtool")
 
 	app.Register("check-config", &cli.Command{
@@ -204,6 +245,11 @@ func main() {
 	app.Register("version", &cli.Command{
 		Desc: "print the version of this binary",
 		Run:  VersionCmd,
+	})
+
+	app.Register("query", &cli.Command{
+		Desc: "query <expression>",
+		Run:  Query,
 	})
 
 	t := cli.BasicTerm(os.Stdout, os.Stderr)
