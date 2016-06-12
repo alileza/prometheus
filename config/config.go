@@ -629,6 +629,9 @@ func (c *FileSDConfig) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err != nil {
 		return err
 	}
+	for key := range c.XXX {
+		return fmt.Errorf("unknown fields %s", key)
+	}
 	if len(c.Files) == 0 {
 		return fmt.Errorf("file service discovery config must contain at least one path name")
 	}
