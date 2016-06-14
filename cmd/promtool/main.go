@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -57,6 +58,70 @@ func Query(t cli.Term, args ...string) int {
 
 	api := prometheus.NewQueryAPI(client)
 	result, err := api.Query(ctx, args[0], time.Now())
+	if err != nil {
+		t.Errorf(" FAILED: %s", err)
+		return 1
+	}
+
+	fmt.Println(result)
+	return 0
+}
+
+// QueryRange returns range metrics from the prometheus server.
+func QueryRange(t cli.Term, args ...string) int {
+	if len(args) < 3 {
+		t.Infof("usage: promtool [flags] query_range <expression> <end_timestamp> <range_seconds> [<step_seconds>]")
+		return 2
+	}
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, *timeout)
+	defer cancel()
+
+	client, err := prometheus.New(prometheus.Config{
+		Address: *server,
+	})
+	if err != nil {
+		t.Errorf(" FAILED: %s", err)
+		return 1
+	}
+
+	end, err := strconv.ParseInt(args[1], 10, 64)
+	if err != nil {
+		t.Errorf(" FAILED: %s", err)
+		return 1
+	}
+
+	rangeSeconds, err := strconv.ParseUint(args[2], 10, 64)
+	if err != nil {
+		t.Errorf(" FAILED: %s", err)
+		return 1
+	}
+
+	var step uint64
+	if len(args) == 4 {
+		step, err = strconv.ParseUint(args[3], 10, 64)
+		if err != nil {
+			t.Errorf(" FAILED: %s", err)
+			return 1
+		}
+	} else {
+		step = rangeSeconds / 250
+	}
+	if step < 1 {
+		step = 1
+	}
+
+	endTime := time.Unix(end, 0)
+	duration := time.Duration(rangeSeconds * uint64(time.Second/time.Nanosecond))
+	timeRange := prometheus.Range{
+		End:   endTime,
+		Start: endTime.Add(-duration),
+		Step:  time.Duration(step * uint64(time.Second/time.Nanosecond)),
+	}
+
+	api := prometheus.NewQueryAPI(client)
+	result, err := api.QueryRange(ctx, args[0], timeRange)
 	if err != nil {
 		t.Errorf(" FAILED: %s", err)
 		return 1
@@ -250,6 +315,11 @@ func main() {
 	app.Register("query", &cli.Command{
 		Desc: "query <expression>",
 		Run:  Query,
+	})
+
+	app.Register("query_range", &cli.Command{
+		Desc: "query_range <expression> <end_timestamp> <range_seconds> [<step_seconds>]",
+		Run:  QueryRange,
 	})
 
 	t := cli.BasicTerm(os.Stdout, os.Stderr)
