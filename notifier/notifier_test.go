@@ -14,6 +14,7 @@
 package notifier
 
 import (
+	"bytes"
 	"context"
 	"crypto/md5"
 	"encoding/json"
@@ -24,6 +25,8 @@ import (
 	"net/url"
 	"testing"
 	"time"
+
+	"github.com/prometheus/prometheus/pkg/relabel"
 
 	yaml "gopkg.in/yaml.v2"
 
@@ -222,7 +225,7 @@ func TestCustomDo(t *testing.T) {
 			testutil.Equals(t, testURL, req.URL.String())
 
 			return &http.Response{
-				Body: ioutil.NopCloser(nil),
+				Body: ioutil.NopCloser(bytes.NewBuffer(nil)),
 			}, nil
 		},
 	}, nil)
@@ -235,13 +238,13 @@ func TestCustomDo(t *testing.T) {
 func TestExternalLabels(t *testing.T) {
 	h := NewManager(&Options{
 		QueueCapacity:  3 * maxBatchSize,
-		ExternalLabels: model.LabelSet{"a": "b"},
-		RelabelConfigs: []*config.RelabelConfig{
+		ExternalLabels: labels.Labels{{Name: "a", Value: "b"}},
+		RelabelConfigs: []*relabel.Config{
 			{
 				SourceLabels: model.LabelNames{"alertname"},
 				TargetLabel:  "a",
 				Action:       "replace",
-				Regex:        config.MustNewRegexp("externalrelabelthis"),
+				Regex:        relabel.MustNewRegexp("externalrelabelthis"),
 				Replacement:  "c",
 			},
 		},
@@ -269,17 +272,17 @@ func TestExternalLabels(t *testing.T) {
 func TestHandlerRelabel(t *testing.T) {
 	h := NewManager(&Options{
 		QueueCapacity: 3 * maxBatchSize,
-		RelabelConfigs: []*config.RelabelConfig{
+		RelabelConfigs: []*relabel.Config{
 			{
 				SourceLabels: model.LabelNames{"alertname"},
 				Action:       "drop",
-				Regex:        config.MustNewRegexp("drop"),
+				Regex:        relabel.MustNewRegexp("drop"),
 			},
 			{
 				SourceLabels: model.LabelNames{"alertname"},
 				TargetLabel:  "alertname",
 				Action:       "replace",
-				Regex:        config.MustNewRegexp("rename"),
+				Regex:        relabel.MustNewRegexp("rename"),
 				Replacement:  "renamed",
 			},
 		},
@@ -382,7 +385,7 @@ func TestHandlerQueueing(t *testing.T) {
 	expected = alerts[:maxBatchSize]
 	unblock <- struct{}{}
 
-	for i := 2; i < 4; i++ {
+	for i := 2; i < 5; i++ {
 		select {
 		case <-called:
 			expected = alerts[i*maxBatchSize : (i+1)*maxBatchSize]
