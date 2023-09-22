@@ -128,6 +128,8 @@ type Options struct {
 	Do func(ctx context.Context, client *http.Client, req *http.Request) (*http.Response, error)
 
 	Registerer prometheus.Registerer
+
+	EnforceLabelRules []relabel.LabelRule
 }
 
 type alertMetrics struct {
@@ -355,6 +357,11 @@ func (n *Manager) Send(alerts ...*Alert) {
 		return
 	}
 
+	alerts = n.relabelAlertsByDefaultRules(alerts)
+	if len(alerts) == 0 {
+		return
+	}
+
 	// Queue capacity should be significantly larger than a single alert
 	// batch could be.
 	if d := len(alerts) - n.opts.QueueCapacity; d > 0 {
@@ -398,6 +405,20 @@ func (n *Manager) relabelAlerts(alerts []*Alert) []*Alert {
 		a.Labels = lb.Labels()
 		relabeledAlerts = append(relabeledAlerts, a)
 	}
+	return relabeledAlerts
+}
+
+func (n *Manager) relabelAlertsByDefaultRules(alerts []*Alert) []*Alert {
+	var relabeledAlerts []*Alert
+
+	for _, alert := range alerts {
+		labels := relabel.Enforce(alert.Labels, n.opts.EnforceLabelRules)
+		if labels != nil {
+			alert.Labels = labels
+			relabeledAlerts = append(relabeledAlerts, alert)
+		}
+	}
+
 	return relabeledAlerts
 }
 

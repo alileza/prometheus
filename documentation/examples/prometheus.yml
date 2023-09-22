@@ -6,6 +6,15 @@ global:
 
 # Alertmanager configuration
 alerting:
+  alert_label_default_rules:
+    - if: name == 'argocd'
+      then: 
+        team: devops
+        department: platform
+    - if: job == 'rds-exporter'
+      then: 
+        team: dba
+        component: aws
   alertmanagers:
     - static_configs:
         - targets:
