@@ -16,6 +16,7 @@ package relabel
 import (
 	"crypto/md5"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/grafana/regexp"
@@ -267,4 +268,49 @@ func sum64(hash [md5.Size]byte) uint64 {
 		s |= uint64(b) << shift
 	}
 	return s
+}
+
+type LabelRule struct {
+	If   string                      `yaml:"if" json:"if"`
+	Then map[string]model.LabelValue `yaml:"then" json:"then"`
+}
+
+func Enforce(lset labels.Labels, rules []LabelRule) labels.Labels {
+	lb := labels.NewBuilder(lset)
+	for _, rule := range rules {
+		keyAndValue, err := parseCondition(rule.If)
+		if err != nil {
+			log.Printf("[ERR] failed to parse condition: %s", err)
+			continue
+		}
+		if lb.Labels().Has(keyAndValue[0]) && lb.Labels().Get(keyAndValue[0]) == keyAndValue[1] {
+			for key, value := range rule.Then {
+				lb = lb.Set(key, string(value))
+			}
+		}
+	}
+	return lb.Labels()
+}
+
+func sanitize(input string) string {
+	// Define a regular expression to match non-alphanumeric characters
+	regex := regexp.MustCompile("[^a-zA-Z0-9]+")
+
+	// Replace non-alphanumeric characters with an empty string
+	sanitizedString := regex.ReplaceAllString(input, "")
+
+	return strings.ToLower(sanitizedString)
+}
+
+func parseCondition(condition string) ([]string, error) {
+	ss := strings.Split(condition, "==")
+
+	if len(ss) != 2 {
+		return []string{}, fmt.Errorf("invalid if string: %s", condition)
+	}
+
+	return []string{
+		sanitize(ss[0]),
+		sanitize(ss[1]),
+	}, nil
 }

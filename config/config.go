@@ -585,6 +585,7 @@ type ExemplarsConfig struct {
 type AlertingConfig struct {
 	AlertRelabelConfigs []*relabel.Config   `yaml:"alert_relabel_configs,omitempty"`
 	AlertmanagerConfigs AlertmanagerConfigs `yaml:"alertmanagers,omitempty"`
+	EnforceLabelRules   []relabel.LabelRule `yaml:"enforce_label_rules,omitempty"`
 }
 
 // SetDirectory joins any relative file paths with dir.

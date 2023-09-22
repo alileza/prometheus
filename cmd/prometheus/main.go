@@ -530,6 +530,7 @@ func main() {
 		fanoutStorage = storage.NewFanout(logger, localStorage, remoteStorage)
 	)
 
+	cfg.notifier.EnforceLabelRules = cfgFile.AlertingConfig.EnforceLabelRules
 	var (
 		ctxWeb, cancelWeb = context.WithCancel(context.Background())
 		ctxRule           = context.Background()
