@@ -21,7 +21,7 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-kit/log v0.2.1
 	github.com/go-logfmt/logfmt v0.6.0
-	github.com/go-openapi/strfmt v0.21.7
+	github.com/go-openapi/strfmt v0.23.0
 	github.com/go-zookeeper/zk v1.0.3
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/snappy v0.0.4
@@ -52,7 +52,7 @@ require (
 	github.com/prometheus/exporter-toolkit v0.10.0
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.20
 	github.com/shurcooL/httpfs v0.0.0-20230704072500-f1e31cf0ba5c
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/vultr/govultr/v2 v2.17.2
 	go.opentelemetry.io/collector/pdata v1.0.0-rcv0014
 	go.opentelemetry.io/collector/semconv v0.81.0
@@ -70,7 +70,7 @@ require (
 	golang.org/x/net v0.13.0
 	golang.org/x/oauth2 v0.10.0
 	golang.org/x/sync v0.3.0
-	golang.org/x/sys v0.10.0
+	golang.org/x/sys v0.15.0
 	golang.org/x/time v0.3.0
 	golang.org/x/tools v0.11.0
 	google.golang.org/api v0.132.0
@@ -97,7 +97,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	google.golang.org/genproto v0.0.0-20230717213848-3f92550aa753 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230717213848-3f92550aa753 // indirect
@@ -130,7 +130,7 @@ require (
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/analysis v0.21.4 // indirect
-	github.com/go-openapi/errors v0.20.4 // indirect
+	github.com/go-openapi/errors v0.22.0 // indirect
 	github.com/go-openapi/jsonpointer v0.20.0 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
 	github.com/go-openapi/loads v0.21.2 // indirect
@@ -145,7 +145,7 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/uuid v1.3.0
+	github.com/google/uuid v1.6.0
 	github.com/googleapis/enterprise-certificate-proxy v0.2.5 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
@@ -179,16 +179,16 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/procfs v0.11.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	go.mongodb.org/mongo-driver v1.12.0 // indirect
+	go.mongodb.org/mongo-driver v1.14.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.16.0 // indirect
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
-	golang.org/x/crypto v0.11.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/term v0.10.0 // indirect
-	golang.org/x/text v0.11.0 // indirect
+	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
